@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Controle Muay Thai e Boxe</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Controle financeiro</p>
+          <h1>Muay Thai e Boxe</h1>
+        </div>
+        <div class="actions">
+          <button id="addStudent" type="button">Adicionar aluno</button>
+          <button id="exportCsv" type="button">Exportar CSV</button>
+          <button id="resetData" class="ghost" type="button">Restaurar dados</button>
+        </div>
+      </header>
+
+      <section class="summary-grid" aria-label="Resumo">
+        <article class="metric paid">
+          <span>Pago</span>
+          <strong id="paidTotal">R$ 0,00</strong>
+          <small id="paidCount">0 alunos</small>
+        </article>
+        <article class="metric unpaid">
+          <span>Não pago</span>
+          <strong id="unpaidTotal">R$ 0,00</strong>
+          <small id="unpaidCount">0 alunos</small>
+        </article>
+        <article class="metric charged">
+          <span>Cobrado</span>
+          <strong id="chargedTotal">R$ 0,00</strong>
+          <small id="chargedCount">0 alunos</small>
+        </article>
+        <article class="metric overdue">
+          <span>Inadimplente</span>
+          <strong id="overdueTotal">R$ 0,00</strong>
+          <small id="overdueCount">0 alunos</small>
+        </article>
+      </section>
+
+      <section class="filters" aria-label="Filtros">
+        <label>
+          Buscar
+          <input id="searchInput" type="search" placeholder="Nome, turma ou observação" />
+        </label>
+        <label>
+          Status
+          <select id="statusFilter">
+            <option value="">Todos</option>
+            <option value="Pago">Pago</option>
+            <option value="Cobrado">Cobrado</option>
+            <option value="Inadimplente">Inadimplente</option>
+          </select>
+        </label>
+        <label>
+          Turma
+          <select id="classFilter">
+            <option value="">Todas</option>
+          </select>
+        </label>
+        <label>
+          Categoria
+          <select id="categoryFilter">
+            <option value="">Todas</option>
+            <option value="Mensal">Mensal</option>
+            <option value="Semestral">Semestral</option>
+            <option value="Anual">Anual</option>
+            <option value="TotalPass">TotalPass</option>
+          </select>
+        </label>
+        <label>
+          Forma
+          <select id="paymentFilter">
+            <option value="">Todas</option>
+            <option value="Pix/Outros">Pix/Outros</option>
+            <option value="Pix">Pix</option>
+            <option value="Dinheiro">Dinheiro</option>
+            <option value="Cartao de credito">Cartão de crédito</option>
+          </select>
+        </label>
+      </section>
+
+      <section class="table-wrap" aria-label="Alunos">
+        <table>
+          <thead>
+            <tr>
+              <th>Aluno</th>
+              <th>Cobrado?</th>
+              <th>Pago?</th>
+              <th>Status</th>
+              <th>Categoria</th>
+              <th>Turma</th>
+              <th>Valor</th>
+              <th>Forma</th>
+              <th>Observação</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="studentRows"></tbody>
+        </table>
+      </section>
+    </main>
+
+    <template id="rowTemplate">
+      <tr>
+        <td><input class="name-input" data-field="aluno" /></td>
+        <td>
+          <select data-field="cobrado">
+            <option value="Nao">Nao</option>
+            <option value="Sim">Sim</option>
+          </select>
+        </td>
+        <td>
+          <select data-field="pago">
+            <option value="Nao">Nao</option>
+            <option value="Sim">Sim</option>
+          </select>
+        </td>
+        <td><span class="status-pill"></span></td>
+        <td>
+          <select data-field="categoria">
+            <option value="Mensal">Mensal</option>
+            <option value="Semestral">Semestral</option>
+            <option value="Anual">Anual</option>
+            <option value="TotalPass">TotalPass</option>
+          </select>
+        </td>
+        <td>
+          <select data-field="turma">
+            <option value="Muay Thai 08:00">Muay Thai 08:00</option>
+            <option value="Boxe 16:30">Boxe 16:30</option>
+            <option value="Muay Thai 17:40">Muay Thai 17:40</option>
+            <option value="Muay Thai 19:00">Muay Thai 19:00</option>
+          </select>
+        </td>
+        <td><input data-field="valor" inputmode="decimal" /></td>
+        <td>
+          <select data-field="forma">
+            <option value="Pix/Outros">Pix/Outros</option>
+            <option value="Pix">Pix</option>
+            <option value="Dinheiro">Dinheiro</option>
+            <option value="Cartao de credito">Cartão de crédito</option>
+          </select>
+        </td>
+        <td><input data-field="observacao" /></td>
+        <td><button class="delete-row" type="button">Remover</button></td>
+      </tr>
+    </template>
+
+    <script src="./data.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
