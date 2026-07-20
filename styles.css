@@ -23,6 +23,10 @@ body {
   overflow-x: auto;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 button,
 input,
 select {
@@ -32,6 +36,31 @@ select {
 .app-shell {
   min-height: 100vh;
   padding: 20px 20px 84px;
+}
+
+.login-view {
+  align-items: center;
+  display: flex;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.login-box {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 12px;
+  margin: auto;
+  max-width: 420px;
+  padding: 22px;
+  width: 100%;
+}
+
+.login-message {
+  color: var(--overdue);
+  font-weight: 700;
+  margin: 0;
 }
 
 .topbar {
@@ -242,6 +271,39 @@ select:disabled {
   color: #5a5200;
 }
 
+.professor-list {
+  display: grid;
+  gap: 8px;
+}
+
+.professor-card {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-left: 7px solid var(--overdue);
+  border-radius: 8px;
+  display: grid;
+  gap: 4px;
+  grid-template-columns: minmax(150px, 1fr) auto auto;
+  padding: 10px;
+}
+
+.professor-card.status-pago {
+  border-left-color: var(--paid);
+}
+
+.professor-card.status-cobrado {
+  border-left-color: #d6cc00;
+}
+
+.professor-card span {
+  font-weight: 700;
+}
+
+.professor-card small {
+  color: var(--muted);
+}
+
 .table-wrap {
   background: var(--surface);
   border: 1px solid var(--line);
@@ -403,7 +465,7 @@ tr.status-inadimplente td:first-child input {
   }
 
   .actions {
-    display: none;
+    display: flex;
   }
 
   .sticky-panel {
@@ -425,6 +487,10 @@ tr.status-inadimplente td:first-child input {
 
   .filters {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .professor-card {
+    grid-template-columns: 1fr;
   }
 
   .table-wrap {

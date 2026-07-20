@@ -4,9 +4,26 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Controle Muay Thai e Boxe</title>
-    <link rel="stylesheet" href="./styles.css?v=8" />
+    <link rel="stylesheet" href="./styles.css?v=9" />
   </head>
   <body>
+    <section id="loginView" class="login-view" hidden>
+      <form id="loginForm" class="login-box">
+        <p class="eyebrow">Acesso restrito</p>
+        <h1>Entrar no controle</h1>
+        <label>
+          E-mail
+          <input id="loginEmail" type="email" autocomplete="email" required />
+        </label>
+        <label>
+          Senha
+          <input id="loginPassword" type="password" autocomplete="current-password" required />
+        </label>
+        <button type="submit">Entrar</button>
+        <p id="loginMessage" class="login-message"></p>
+      </form>
+    </section>
+
     <main class="app-shell">
       <header class="topbar">
         <div>
@@ -15,9 +32,11 @@
           <p id="accessBadge" class="access-badge"></p>
         </div>
         <div class="actions">
+          <button id="saveData" type="button">Salvar alterações</button>
           <button id="addStudent" type="button">Adicionar aluno</button>
           <button id="exportCsv" type="button">Exportar CSV</button>
           <button id="resetData" class="ghost" type="button">Restaurar dados</button>
+          <button id="logout" class="ghost" type="button" hidden>Sair</button>
         </div>
       </header>
 
@@ -121,6 +140,8 @@
           <tbody id="studentRows"></tbody>
         </table>
       </section>
+
+      <section id="professorView" class="professor-list" aria-label="Consulta do professor" hidden></section>
     </main>
 
     <button id="addStudentFab" class="fab" type="button">+ Aluno</button>
@@ -171,7 +192,9 @@
       </tr>
     </template>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="./supabase-config.js?v=1"></script>
     <script src="./data.js?v=4"></script>
-    <script src="./app.js?v=8"></script>
+    <script src="./app.js?v=9"></script>
   </body>
 </html>

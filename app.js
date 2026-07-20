@@ -1,11 +1,19 @@
 const STORAGE_KEY = "controle-muaythai-alunos-v1";
+const DRAFT_KEY = "controle-muaythai-alunos-draft-v1";
 const OWNER_EMAIL = "vineleme@icloud.com";
 const money = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
 const accessMode = new URLSearchParams(window.location.search).get("acesso") || "admin";
-const isProfessorMode = accessMode === "professor";
+const supabaseConfig = window.SUPABASE_CONFIG || {};
+const hasSupabaseConfig = Boolean(supabaseConfig.url && supabaseConfig.anonKey && window.supabase);
+const db = hasSupabaseConfig ? window.supabase.createClient(supabaseConfig.url, supabaseConfig.anonKey) : null;
+const hasDraftOnLoad = Boolean(localStorage.getItem(DRAFT_KEY));
+let isProfessorMode = accessMode === "professor";
 
 const state = {
   students: loadStudents(),
+  dirty: hasDraftOnLoad,
+  user: null,
+  role: isProfessorMode ? "professor" : "admin",
   filters: {
     search: "",
     status: "",
@@ -16,8 +24,18 @@ const state = {
 };
 
 const els = {
+  app: document.querySelector(".app-shell"),
+  loginView: document.querySelector("#loginView"),
+  loginForm: document.querySelector("#loginForm"),
+  loginEmail: document.querySelector("#loginEmail"),
+  loginPassword: document.querySelector("#loginPassword"),
+  loginMessage: document.querySelector("#loginMessage"),
   rows: document.querySelector("#studentRows"),
   template: document.querySelector("#rowTemplate"),
+  summary: document.querySelector(".summary-grid"),
+  stickyPanel: document.querySelector(".sticky-panel"),
+  tableWrap: document.querySelector(".table-wrap"),
+  professorView: document.querySelector("#professorView"),
   search: document.querySelector("#searchInput"),
   searchPanel: document.querySelector("#searchPanel"),
   toggleSearch: document.querySelector("#toggleSearch"),
@@ -25,11 +43,13 @@ const els = {
   turma: document.querySelector("#classFilter"),
   categoria: document.querySelector("#categoryFilter"),
   forma: document.querySelector("#paymentFilter"),
+  save: document.querySelector("#saveData"),
   add: document.querySelector("#addStudent"),
   addFab: document.querySelector("#addStudentFab"),
   accessBadge: document.querySelector("#accessBadge"),
   exportCsv: document.querySelector("#exportCsv"),
   reset: document.querySelector("#resetData"),
+  logout: document.querySelector("#logout"),
   paidTotal: document.querySelector("#paidTotal"),
   paidCount: document.querySelector("#paidCount"),
   unpaidTotal: document.querySelector("#unpaidTotal"),
@@ -41,6 +61,14 @@ const els = {
 };
 
 function loadStudents() {
+  const draft = localStorage.getItem(DRAFT_KEY);
+  if (draft) {
+    try {
+      return normalizeStudents(JSON.parse(draft));
+    } catch {
+      localStorage.removeItem(DRAFT_KEY);
+    }
+  }
   const saved = localStorage.getItem(STORAGE_KEY);
   if (saved) {
     try {
@@ -54,6 +82,23 @@ function loadStudents() {
 
 function saveStudents() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state.students));
+  localStorage.removeItem(DRAFT_KEY);
+  state.dirty = false;
+  applyAccessMode();
+}
+
+async function persistStudents() {
+  if (!hasSupabaseConfig) {
+    saveStudents();
+    return;
+  }
+  const rows = state.students.map(toDbRow);
+  const { error } = await db.from("students").upsert(rows, { onConflict: "id" });
+  if (error) {
+    alert(`Não consegui salvar no banco: ${error.message}`);
+    return;
+  }
+  saveStudents();
 }
 
 function normalizeStudents(students) {
@@ -116,6 +161,7 @@ function render() {
   updateClassFilter();
   const students = visibleStudents();
   els.rows.replaceChildren();
+  renderProfessorView(students);
 
   for (const student of students) {
     const row = els.template.content.firstElementChild.cloneNode(true);
@@ -150,11 +196,18 @@ function render() {
 
 function applyAccessMode() {
   document.body.classList.toggle("professor-mode", isProfessorMode);
-  els.accessBadge.textContent = isProfessorMode
-    ? "Acesso professor: pode consultar pagamentos e cadastrar novos alunos sem valor."
-    : "";
+  els.app.hidden = hasSupabaseConfig && !state.user;
+  els.loginView.hidden = !hasSupabaseConfig || Boolean(state.user);
+  els.accessBadge.textContent = isProfessorMode ? "Acesso professor: consulta de pagamento." : saveStatusText();
+  els.summary.hidden = isProfessorMode;
+  els.tableWrap.hidden = isProfessorMode;
+  els.professorView.hidden = !isProfessorMode;
+  els.save.hidden = isProfessorMode;
+  els.add.hidden = isProfessorMode;
+  els.addFab.hidden = isProfessorMode;
   els.exportCsv.hidden = isProfessorMode;
   els.reset.hidden = isProfessorMode;
+  els.logout.hidden = !hasSupabaseConfig || !state.user;
 }
 
 function applyFieldPermission(input, student, field) {
@@ -192,6 +245,21 @@ function renderSummary(students) {
   els.overdueCount.textContent = `${buckets.Inadimplente.count} alunos`;
 }
 
+function renderProfessorView(students) {
+  els.professorView.replaceChildren();
+  for (const student of students) {
+    const item = document.createElement("article");
+    const status = statusOf(student);
+    item.className = `professor-card ${rowClass(status)}`;
+    item.innerHTML = `
+      <strong>${escapeHtml(student.aluno || "Sem nome")}</strong>
+      <span>${escapeHtml(status)}</span>
+      <small>${escapeHtml(student.categoria || "")}</small>
+    `;
+    els.professorView.append(item);
+  }
+}
+
 function updateStudent(id, field, rawValue) {
   const student = state.students.find((item) => item.id === id);
   if (!student) return;
@@ -205,8 +273,19 @@ function updateStudent(id, field, rawValue) {
     student.modalidade = modalidade;
     student.horario = horario;
   }
-  saveStudents();
+  markDirty();
   render();
+}
+
+function markDirty() {
+  state.dirty = true;
+  localStorage.setItem(DRAFT_KEY, JSON.stringify(state.students));
+  applyAccessMode();
+}
+
+function saveStatusText() {
+  if (state.dirty) return "Alterações pendentes. Clique em Salvar alterações.";
+  return "Tudo salvo.";
 }
 
 function splitClass(turma) {
@@ -232,14 +311,14 @@ function addStudent() {
   };
   state.students.push(newStudent);
   clearFilters();
-  saveStudents();
+  markDirty();
   render();
   requestAnimationFrame(() => {
     const row = document.querySelector(`[data-id="${newStudent.id}"]`);
     row?.scrollIntoView({ behavior: "smooth", block: "center" });
     row?.querySelector('[data-field="aluno"]')?.focus();
     delete newStudent.isNew;
-    saveStudents();
+    markDirty();
   });
 }
 
@@ -249,7 +328,7 @@ function handleDelete(student) {
     return;
   }
   state.students = state.students.filter((item) => item.id !== student.id);
-  saveStudents();
+  markDirty();
   render();
 }
 
@@ -322,8 +401,118 @@ function resetData() {
   const confirmed = confirm("Restaurar os dados iniciais da planilha? As alterações feitas no app serão apagadas.");
   if (!confirmed) return;
   localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(DRAFT_KEY);
   state.students = structuredClone(window.INITIAL_STUDENTS || []);
+  state.dirty = true;
   render();
+}
+
+async function loadSession() {
+  if (!hasSupabaseConfig) return;
+  const { data } = await db.auth.getSession();
+  state.user = data.session?.user || null;
+  if (state.user) {
+    await loadRole();
+    await loadStudentsFromDb();
+  }
+  render();
+}
+
+async function loadRole() {
+  const { data, error } = await db.from("profiles").select("role").eq("user_id", state.user.id).single();
+  if (error) {
+    state.role = "professor";
+  } else {
+    state.role = data.role || "professor";
+  }
+  isProfessorMode = state.role === "professor";
+}
+
+async function loadStudentsFromDb() {
+  const request = isProfessorMode
+    ? db.rpc("get_professor_students")
+    : db.from("students").select("*").order("aluno", { ascending: true });
+  const { data, error } = await request;
+  if (error) {
+    alert(`Não consegui carregar o banco: ${error.message}`);
+    return;
+  }
+  if (!isProfessorMode && (!data || data.length === 0)) {
+    state.students = normalizeStudents(structuredClone(window.INITIAL_STUDENTS || []));
+    state.dirty = true;
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(state.students));
+    return;
+  }
+  state.students = normalizeStudents((data || []).map(fromDbRow));
+  saveStudents();
+}
+
+async function login(event) {
+  event.preventDefault();
+  els.loginMessage.textContent = "Entrando...";
+  const { data, error } = await db.auth.signInWithPassword({
+    email: els.loginEmail.value,
+    password: els.loginPassword.value,
+  });
+  if (error) {
+    els.loginMessage.textContent = "E-mail ou senha inválidos.";
+    return;
+  }
+  state.user = data.user;
+  await loadRole();
+  await loadStudentsFromDb();
+  els.loginMessage.textContent = "";
+  render();
+}
+
+async function logout() {
+  if (hasSupabaseConfig) await db.auth.signOut();
+  state.user = null;
+  render();
+}
+
+function toDbRow(student) {
+  return {
+    id: student.id,
+    aluno: student.aluno || "",
+    modalidade: student.modalidade || "Muay Thai",
+    horario: student.horario || "19:00",
+    turma: student.turma || "Muay Thai 19:00",
+    cobrado: student.cobrado || "Nao",
+    pago: student.pago || "Nao",
+    valor: Number(student.valor || 0),
+    forma: student.forma || "Pix/Outros",
+    categoria: student.categoria || "Mensal",
+    observacao: student.observacao || "",
+    created_by: student.createdBy || "admin",
+    updated_at: new Date().toISOString(),
+  };
+}
+
+function fromDbRow(row) {
+  return {
+    id: row.id,
+    aluno: row.aluno,
+    modalidade: row.modalidade || "Muay Thai",
+    horario: row.horario || "",
+    turma: row.turma,
+    cobrado: row.cobrado || "Nao",
+    pago: row.pago,
+    valor: Number(row.valor || 0),
+    forma: row.forma || "",
+    categoria: row.categoria,
+    observacao: row.observacao || "",
+    createdBy: row.created_by || "admin",
+  };
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
 function wireFilters() {
@@ -344,8 +533,12 @@ function wireFilters() {
 
 els.add.addEventListener("click", addStudent);
 els.addFab.addEventListener("click", addStudent);
+els.save.addEventListener("click", persistStudents);
 els.toggleSearch.addEventListener("click", toggleSearchPanel);
 els.exportCsv.addEventListener("click", exportCsv);
 els.reset.addEventListener("click", resetData);
+els.loginForm.addEventListener("submit", login);
+els.logout.addEventListener("click", logout);
 wireFilters();
+loadSession();
 render();
