@@ -1,5 +1,7 @@
 const STORAGE_KEY = "controle-muaythai-alunos-v1";
 const DRAFT_KEY = "controle-muaythai-alunos-draft-v1";
+const ADMIN_PASSWORD_KEY = "controle-muaythai-admin-password-v1";
+const ADMIN_UNLOCK_KEY = "controle-muaythai-admin-unlocked-v1";
 const OWNER_EMAIL = "vineleme@icloud.com";
 const money = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
 const accessMode = new URLSearchParams(window.location.search).get("acesso") || "admin";
@@ -8,6 +10,7 @@ const hasSupabaseConfig = Boolean(supabaseConfig.url && supabaseConfig.anonKey &
 const db = hasSupabaseConfig ? window.supabase.createClient(supabaseConfig.url, supabaseConfig.anonKey) : null;
 const hasDraftOnLoad = Boolean(localStorage.getItem(DRAFT_KEY));
 let isProfessorMode = accessMode === "professor";
+let isAdminUnlocked = isProfessorMode || hasSupabaseConfig || sessionStorage.getItem(ADMIN_UNLOCK_KEY) === "Sim";
 
 const state = {
   students: loadStudents(),
@@ -27,6 +30,8 @@ const els = {
   app: document.querySelector(".app-shell"),
   loginView: document.querySelector("#loginView"),
   loginForm: document.querySelector("#loginForm"),
+  loginTitle: document.querySelector("#loginTitle"),
+  loginEmailLabel: document.querySelector("#loginEmailLabel"),
   loginEmail: document.querySelector("#loginEmail"),
   loginPassword: document.querySelector("#loginPassword"),
   loginMessage: document.querySelector("#loginMessage"),
@@ -198,9 +203,11 @@ function render() {
 }
 
 function applyAccessMode() {
+  const needsLocalAdminLogin = !hasSupabaseConfig && !isProfessorMode && !isAdminUnlocked;
   document.body.classList.toggle("professor-mode", isProfessorMode);
-  els.app.hidden = hasSupabaseConfig && !state.user;
-  els.loginView.hidden = !hasSupabaseConfig || Boolean(state.user);
+  els.app.hidden = (hasSupabaseConfig && !state.user) || needsLocalAdminLogin;
+  els.loginView.hidden = !((hasSupabaseConfig && !state.user) || needsLocalAdminLogin);
+  updateLoginView();
   els.accessBadge.textContent = isProfessorMode
     ? "Acesso professor: consulta completa, cadastro de aluno novo e solicitação de remoção."
     : saveStatusText();
@@ -212,7 +219,20 @@ function applyAccessMode() {
   els.addFab.hidden = false;
   els.exportCsv.hidden = isProfessorMode;
   els.reset.hidden = isProfessorMode;
-  els.logout.hidden = !hasSupabaseConfig || !state.user;
+  els.logout.hidden = isProfessorMode || (hasSupabaseConfig ? !state.user : !isAdminUnlocked);
+}
+
+function updateLoginView() {
+  if (hasSupabaseConfig) {
+    els.loginTitle.textContent = "Entrar no controle";
+    els.loginEmailLabel.hidden = false;
+    els.loginEmail.required = true;
+    return;
+  }
+  const hasPassword = Boolean(localStorage.getItem(ADMIN_PASSWORD_KEY));
+  els.loginTitle.textContent = hasPassword ? "Senha do administrador" : "Criar senha do administrador";
+  els.loginEmailLabel.hidden = true;
+  els.loginEmail.required = false;
 }
 
 function applyFieldPermission(input, student, field) {
@@ -479,6 +499,10 @@ async function loadStudentsFromDb() {
 
 async function login(event) {
   event.preventDefault();
+  if (!hasSupabaseConfig) {
+    await loginLocalAdmin();
+    return;
+  }
   els.loginMessage.textContent = "Entrando...";
   const { data, error } = await db.auth.signInWithPassword({
     email: els.loginEmail.value,
@@ -498,7 +522,43 @@ async function login(event) {
 async function logout() {
   if (hasSupabaseConfig) await db.auth.signOut();
   state.user = null;
+  isAdminUnlocked = isProfessorMode;
+  sessionStorage.removeItem(ADMIN_UNLOCK_KEY);
   render();
+}
+
+async function loginLocalAdmin() {
+  const password = els.loginPassword.value;
+  if (!password) {
+    els.loginMessage.textContent = "Digite a senha.";
+    return;
+  }
+  const currentHash = localStorage.getItem(ADMIN_PASSWORD_KEY);
+  const enteredHash = await hashPassword(password);
+  if (!currentHash) {
+    localStorage.setItem(ADMIN_PASSWORD_KEY, enteredHash);
+    unlockLocalAdmin();
+    return;
+  }
+  if (enteredHash !== currentHash) {
+    els.loginMessage.textContent = "Senha incorreta.";
+    return;
+  }
+  unlockLocalAdmin();
+}
+
+function unlockLocalAdmin() {
+  isAdminUnlocked = true;
+  sessionStorage.setItem(ADMIN_UNLOCK_KEY, "Sim");
+  els.loginPassword.value = "";
+  els.loginMessage.textContent = "";
+  render();
+}
+
+async function hashPassword(password) {
+  const bytes = new TextEncoder().encode(password);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", bytes);
+  return [...new Uint8Array(hashBuffer)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
 function toDbRow(student) {
