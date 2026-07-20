@@ -120,12 +120,10 @@ button.ghost,
   border-bottom: 1px solid rgba(216, 228, 225, 0.8);
   margin: 0 -20px 14px;
   padding: 10px 20px 12px;
-  position: sticky;
-  top: 0;
-  z-index: 5;
 }
 
 .quick-status {
+  align-items: center;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -143,6 +141,34 @@ button.ghost,
   gap: 6px;
   min-height: 30px;
   padding: 5px 9px;
+}
+
+.search-toggle {
+  align-items: center;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+  height: 34px;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0;
+  width: 42px;
+}
+
+.search-toggle i {
+  background: #fff;
+  border-radius: 999px;
+  display: block;
+  height: 2px;
+  width: 18px;
+}
+
+.search-panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin-bottom: 10px;
+  padding: 10px;
 }
 
 .dot {
@@ -171,7 +197,7 @@ button.ghost,
   border-radius: 8px;
   display: grid;
   gap: 10px;
-  grid-template-columns: minmax(220px, 2fr) repeat(4, minmax(150px, 1fr));
+  grid-template-columns: repeat(4, minmax(150px, 1fr));
   padding: 12px;
 }
 
@@ -197,7 +223,8 @@ select {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 8px;
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: visible;
 }
 
 table {
@@ -214,7 +241,7 @@ th {
   position: sticky;
   text-align: left;
   top: 0;
-  z-index: 1;
+  z-index: 6;
 }
 
 td {
@@ -329,14 +356,8 @@ tr.status-inadimplente td:first-child input {
     padding: 10px;
   }
 
-  .filters label:first-child {
-    grid-column: 1 / -1;
-  }
-
   .sticky-panel {
     margin-bottom: 10px;
-    max-height: 46vh;
-    overflow: auto;
   }
 
   th {

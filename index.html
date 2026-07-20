@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Controle Muay Thai e Boxe</title>
-    <link rel="stylesheet" href="./styles.css?v=2" />
+    <link rel="stylesheet" href="./styles.css?v=3" />
   </head>
   <body>
     <main class="app-shell">
@@ -48,13 +48,21 @@
           <span><i class="dot paid-dot"></i>Pago</span>
           <span><i class="dot charged-dot"></i>Cobrado</span>
           <span><i class="dot overdue-dot"></i>Não pago</span>
+          <button id="toggleSearch" class="search-toggle" type="button" aria-expanded="false" aria-controls="searchPanel" aria-label="Buscar">
+            <i></i>
+            <i></i>
+            <i></i>
+          </button>
         </div>
 
-        <section class="filters" aria-label="Filtros">
+        <div id="searchPanel" class="search-panel" hidden>
           <label>
             Buscar
             <input id="searchInput" type="search" placeholder="Nome, turma ou observação" />
           </label>
+        </div>
+
+        <section class="filters" aria-label="Filtros">
           <label>
             Status
             <select id="statusFilter">
@@ -163,6 +171,6 @@
     </template>
 
     <script src="./data.js"></script>
-    <script src="./app.js?v=2"></script>
+    <script src="./app.js?v=3"></script>
   </body>
 </html>

@@ -16,6 +16,8 @@ const els = {
   rows: document.querySelector("#studentRows"),
   template: document.querySelector("#rowTemplate"),
   search: document.querySelector("#searchInput"),
+  searchPanel: document.querySelector("#searchPanel"),
+  toggleSearch: document.querySelector("#toggleSearch"),
   status: document.querySelector("#statusFilter"),
   turma: document.querySelector("#classFilter"),
   categoria: document.querySelector("#categoryFilter"),
@@ -220,6 +222,15 @@ function clearFilters() {
   els.forma.value = "";
 }
 
+function toggleSearchPanel() {
+  const isHidden = els.searchPanel.hidden;
+  els.searchPanel.hidden = !isHidden;
+  els.toggleSearch.setAttribute("aria-expanded", String(isHidden));
+  if (isHidden) {
+    requestAnimationFrame(() => els.search.focus());
+  }
+}
+
 function exportCsv() {
   const headers = ["Aluno", "Cobrado", "Pago", "Status", "Categoria", "Turma", "Valor", "Forma", "Observacao"];
   const rows = visibleStudents().map((student) => [
@@ -271,6 +282,7 @@ function wireFilters() {
 
 els.add.addEventListener("click", addStudent);
 els.addFab.addEventListener("click", addStudent);
+els.toggleSearch.addEventListener("click", toggleSearchPanel);
 els.exportCsv.addEventListener("click", exportCsv);
 els.reset.addEventListener("click", resetData);
 wireFilters();
