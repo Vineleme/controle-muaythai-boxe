@@ -61,7 +61,8 @@ returns table (
   aluno text,
   pago text,
   categoria text,
-  turma text
+  turma text,
+  valor numeric
 )
 language sql
 security definer
@@ -72,7 +73,8 @@ as $$
     s.aluno,
     s.pago,
     s.categoria,
-    s.turma
+    s.turma,
+    s.valor
   from public.students s
   where public.current_role() in ('admin', 'professor')
   order by s.aluno;

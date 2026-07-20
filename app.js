@@ -255,6 +255,7 @@ function renderProfessorView(students) {
       <strong>${escapeHtml(student.aluno || "Sem nome")}</strong>
       <span>${escapeHtml(status)}</span>
       <small>${escapeHtml(student.categoria || "")}</small>
+      <b>${money.format(Number(student.valor || 0))}</b>
     `;
     els.professorView.append(item);
   }
