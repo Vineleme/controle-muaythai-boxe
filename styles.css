@@ -54,6 +54,13 @@ h1 {
   margin: 0;
 }
 
+.access-badge {
+  color: var(--brand);
+  font-size: 13px;
+  font-weight: 700;
+  margin: 6px 0 0;
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;
@@ -220,6 +227,19 @@ select {
   min-height: 34px;
   padding: 6px 8px;
   width: 100%;
+}
+
+input:disabled,
+select:disabled {
+  background: #f7faf9;
+  color: var(--ink);
+  opacity: 1;
+}
+
+.professor-mode .delete-row {
+  background: #fff8a8;
+  border-color: #d6cc00;
+  color: #5a5200;
 }
 
 .table-wrap {

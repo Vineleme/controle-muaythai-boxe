@@ -1,5 +1,8 @@
 const STORAGE_KEY = "controle-muaythai-alunos-v1";
+const OWNER_EMAIL = "vineleme@icloud.com";
 const money = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
+const accessMode = new URLSearchParams(window.location.search).get("acesso") || "admin";
+const isProfessorMode = accessMode === "professor";
 
 const state = {
   students: loadStudents(),
@@ -24,6 +27,7 @@ const els = {
   forma: document.querySelector("#paymentFilter"),
   add: document.querySelector("#addStudent"),
   addFab: document.querySelector("#addStudentFab"),
+  accessBadge: document.querySelector("#accessBadge"),
   exportCsv: document.querySelector("#exportCsv"),
   reset: document.querySelector("#resetData"),
   paidTotal: document.querySelector("#paidTotal"),
@@ -108,6 +112,7 @@ function updateClassFilter() {
 }
 
 function render() {
+  applyAccessMode();
   updateClassFilter();
   const students = visibleStudents();
   els.rows.replaceChildren();
@@ -124,6 +129,7 @@ function render() {
     for (const input of row.querySelectorAll("[data-field]")) {
       const field = input.dataset.field;
       input.value = field === "valor" ? String(student.valor || "") : student[field] || "";
+      applyFieldPermission(input, student, field);
       input.addEventListener("input", () => updateStudent(student.id, field, input.value));
       input.addEventListener("change", () => updateStudent(student.id, field, input.value));
     }
@@ -132,16 +138,30 @@ function render() {
     pill.textContent = status;
     pill.className = `status-pill ${rowClass(status).replace("status-", "")}`;
 
-    row.querySelector(".delete-row").addEventListener("click", () => {
-      state.students = state.students.filter((item) => item.id !== student.id);
-      saveStudents();
-      render();
-    });
+    const deleteButton = row.querySelector(".delete-row");
+    deleteButton.textContent = isProfessorMode ? "Pedir remoção" : "Remover";
+    deleteButton.addEventListener("click", () => handleDelete(student));
 
     els.rows.append(row);
   }
 
   renderSummary(students);
+}
+
+function applyAccessMode() {
+  document.body.classList.toggle("professor-mode", isProfessorMode);
+  els.accessBadge.textContent = isProfessorMode
+    ? "Acesso professor: pode consultar pagamentos e cadastrar novos alunos sem valor."
+    : "";
+  els.exportCsv.hidden = isProfessorMode;
+  els.reset.hidden = isProfessorMode;
+}
+
+function applyFieldPermission(input, student, field) {
+  if (!isProfessorMode) return;
+  const canEditNewStudent = student.createdBy === "professor";
+  const allowedFields = ["aluno", "categoria", "turma", "observacao"];
+  input.disabled = !canEditNewStudent || !allowedFields.includes(field);
 }
 
 function renderSummary(students) {
@@ -175,6 +195,10 @@ function renderSummary(students) {
 function updateStudent(id, field, rawValue) {
   const student = state.students.find((item) => item.id === id);
   if (!student) return;
+  if (isProfessorMode) {
+    const allowedFields = ["aluno", "categoria", "turma", "observacao"];
+    if (student.createdBy !== "professor" || !allowedFields.includes(field)) return;
+  }
   student[field] = field === "valor" ? Number(String(rawValue).replace(",", ".")) || 0 : rawValue;
   if (field === "turma") {
     const [modalidade, horario] = splitClass(rawValue);
@@ -204,6 +228,7 @@ function addStudent() {
     categoria: "Mensal",
     observacao: "",
     isNew: true,
+    createdBy: isProfessorMode ? "professor" : "admin",
   };
   state.students.push(newStudent);
   clearFilters();
@@ -216,6 +241,34 @@ function addStudent() {
     delete newStudent.isNew;
     saveStudents();
   });
+}
+
+function handleDelete(student) {
+  if (isProfessorMode) {
+    requestRemoval(student);
+    return;
+  }
+  state.students = state.students.filter((item) => item.id !== student.id);
+  saveStudents();
+  render();
+}
+
+function requestRemoval(student) {
+  const subject = encodeURIComponent("Autorização para remover aluno");
+  const body = encodeURIComponent(
+    [
+      "Olá, Vinicius.",
+      "",
+      "Solicito autorização para remover este aluno do controle:",
+      `Aluno: ${student.aluno || "Sem nome"}`,
+      `Turma: ${student.turma || ""}`,
+      `Categoria: ${student.categoria || ""}`,
+      `Valor: ${money.format(Number(student.valor || 0))}`,
+      "",
+      "Aguardo sua confirmação.",
+    ].join("\n")
+  );
+  window.location.href = `mailto:${OWNER_EMAIL}?subject=${subject}&body=${body}`;
 }
 
 function clearFilters() {
