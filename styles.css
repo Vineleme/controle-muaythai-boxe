@@ -173,6 +173,10 @@ button.ghost,
   padding: 10px;
 }
 
+.search-panel[hidden] {
+  display: none;
+}
+
 .dot {
   border: 1px solid rgba(0, 0, 0, 0.16);
   border-radius: 999px;
@@ -231,7 +235,7 @@ table {
   width: 100%;
 }
 
-th {
+thead th {
   background: var(--brand);
   color: #fff;
   font-size: 13px;
@@ -239,7 +243,7 @@ th {
   position: sticky;
   text-align: left;
   top: 0;
-  z-index: 6;
+  z-index: 20;
 }
 
 td {
