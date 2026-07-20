@@ -165,7 +165,6 @@ function render() {
   updateClassFilter();
   const students = visibleStudents();
   els.rows.replaceChildren();
-  renderProfessorView(students);
 
   for (const student of students) {
     const row = els.template.content.firstElementChild.cloneNode(true);
@@ -203,11 +202,11 @@ function applyAccessMode() {
   els.app.hidden = hasSupabaseConfig && !state.user;
   els.loginView.hidden = !hasSupabaseConfig || Boolean(state.user);
   els.accessBadge.textContent = isProfessorMode
-    ? "Acesso professor: consulta de pagamento e cadastro de aluno novo."
+    ? "Acesso professor: consulta completa, cadastro de aluno novo e solicitação de remoção."
     : saveStatusText();
-  els.summary.hidden = isProfessorMode;
-  els.tableWrap.hidden = isProfessorMode;
-  els.professorView.hidden = !isProfessorMode;
+  els.summary.hidden = false;
+  els.tableWrap.hidden = false;
+  els.professorView.hidden = true;
   els.save.hidden = isProfessorMode;
   els.add.hidden = false;
   els.addFab.hidden = false;
@@ -218,9 +217,7 @@ function applyAccessMode() {
 
 function applyFieldPermission(input, student, field) {
   if (!isProfessorMode) return;
-  const canEditNewStudent = student.createdBy === "professor";
-  const allowedFields = ["aluno", "categoria", "turma", "observacao"];
-  input.disabled = !canEditNewStudent || !allowedFields.includes(field);
+  input.disabled = true;
 }
 
 function renderSummary(students) {
@@ -249,25 +246,6 @@ function renderSummary(students) {
   els.chargedCount.textContent = `${buckets.Cobrado.count} alunos`;
   els.overdueTotal.textContent = money.format(buckets.Inadimplente.total);
   els.overdueCount.textContent = `${buckets.Inadimplente.count} alunos`;
-}
-
-function renderProfessorView(students) {
-  els.professorView.replaceChildren();
-  for (const student of students) {
-    const item = document.createElement("article");
-    const status = statusOf(student);
-    item.className = `professor-card ${rowClass(status)}`;
-    item.innerHTML = `
-      <strong>${escapeHtml(student.aluno || "Sem nome")}</strong>
-      <span>${escapeHtml(status)}</span>
-      <small>${escapeHtml(student.categoria || "")}</small>
-      <em>${escapeHtml(student.turma || "")}</em>
-      <b>${money.format(Number(student.valor || 0))}</b>
-      <button class="delete-row" type="button">Pedir remoção</button>
-    `;
-    item.querySelector(".delete-row").addEventListener("click", () => requestRemoval(student));
-    els.professorView.append(item);
-  }
 }
 
 function updateStudent(id, field, rawValue) {
@@ -370,8 +348,8 @@ async function addProfessorStudent() {
     }
     saveStudents();
   }
-  alert("Aluno adicionado. O valor e pagamento ficam para o administrador lançar.");
   render();
+  alert("Aluno adicionado. O valor e pagamento ficam para o administrador lançar.");
 }
 
 function handleDelete(student) {

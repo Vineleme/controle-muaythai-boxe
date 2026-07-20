@@ -72,10 +72,16 @@ create or replace function public.get_professor_students()
 returns table (
   id text,
   aluno text,
+  modalidade text,
+  horario text,
+  cobrado text,
   pago text,
   categoria text,
   turma text,
-  valor numeric
+  valor numeric,
+  forma text,
+  observacao text,
+  created_by text
 )
 language sql
 security definer
@@ -84,10 +90,16 @@ as $$
   select
     s.id,
     s.aluno,
+    s.modalidade,
+    s.horario,
+    s.cobrado,
     s.pago,
     s.categoria,
     s.turma,
-    s.valor
+    s.valor,
+    s.forma,
+    s.observacao,
+    s.created_by
   from public.students s
   where public.current_role() in ('admin', 'professor')
   order by s.aluno;
