@@ -20,6 +20,7 @@ body {
   margin: 0;
   background: var(--wash);
   color: var(--ink);
+  overflow-x: auto;
 }
 
 button,
@@ -225,14 +226,19 @@ select {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 8px;
-  overflow-x: auto;
-  overflow-y: visible;
+  overflow: visible;
 }
 
 table {
   border-collapse: collapse;
   min-width: 1180px;
   width: 100%;
+}
+
+thead {
+  position: sticky;
+  top: 0;
+  z-index: 20;
 }
 
 thead th {
@@ -243,7 +249,7 @@ thead th {
   position: sticky;
   text-align: left;
   top: 0;
-  z-index: 20;
+  z-index: 21;
 }
 
 td {
