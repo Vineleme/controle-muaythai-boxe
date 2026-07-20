@@ -40,16 +40,25 @@ function loadStudents() {
   const saved = localStorage.getItem(STORAGE_KEY);
   if (saved) {
     try {
-      return JSON.parse(saved);
+      return normalizeStudents(JSON.parse(saved));
     } catch {
       localStorage.removeItem(STORAGE_KEY);
     }
   }
-  return structuredClone(window.INITIAL_STUDENTS || []);
+  return normalizeStudents(structuredClone(window.INITIAL_STUDENTS || []));
 }
 
 function saveStudents() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state.students));
+}
+
+function normalizeStudents(students) {
+  return students.map((student) => {
+    if (student.turma === "Muay Thai 19:00:00") {
+      return { ...student, horario: "19:00", turma: "Muay Thai 19:00" };
+    }
+    return student;
+  });
 }
 
 function normalize(value) {
