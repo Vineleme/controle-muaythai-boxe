@@ -88,6 +88,10 @@ function saveStudents() {
 }
 
 async function persistStudents() {
+  if (isProfessorMode) {
+    saveStudents();
+    return;
+  }
   if (!hasSupabaseConfig) {
     saveStudents();
     return;
@@ -198,13 +202,15 @@ function applyAccessMode() {
   document.body.classList.toggle("professor-mode", isProfessorMode);
   els.app.hidden = hasSupabaseConfig && !state.user;
   els.loginView.hidden = !hasSupabaseConfig || Boolean(state.user);
-  els.accessBadge.textContent = isProfessorMode ? "Acesso professor: consulta de pagamento." : saveStatusText();
+  els.accessBadge.textContent = isProfessorMode
+    ? "Acesso professor: consulta de pagamento e cadastro de aluno novo."
+    : saveStatusText();
   els.summary.hidden = isProfessorMode;
   els.tableWrap.hidden = isProfessorMode;
   els.professorView.hidden = !isProfessorMode;
   els.save.hidden = isProfessorMode;
-  els.add.hidden = isProfessorMode;
-  els.addFab.hidden = isProfessorMode;
+  els.add.hidden = false;
+  els.addFab.hidden = false;
   els.exportCsv.hidden = isProfessorMode;
   els.reset.hidden = isProfessorMode;
   els.logout.hidden = !hasSupabaseConfig || !state.user;
@@ -255,8 +261,11 @@ function renderProfessorView(students) {
       <strong>${escapeHtml(student.aluno || "Sem nome")}</strong>
       <span>${escapeHtml(status)}</span>
       <small>${escapeHtml(student.categoria || "")}</small>
+      <em>${escapeHtml(student.turma || "")}</em>
       <b>${money.format(Number(student.valor || 0))}</b>
+      <button class="delete-row" type="button">Pedir remoção</button>
     `;
+    item.querySelector(".delete-row").addEventListener("click", () => requestRemoval(student));
     els.professorView.append(item);
   }
 }
@@ -295,6 +304,10 @@ function splitClass(turma) {
 }
 
 function addStudent() {
+  if (isProfessorMode) {
+    addProfessorStudent();
+    return;
+  }
   const newStudent = {
     id: `aluno-${Date.now()}`,
     aluno: "Novo aluno",
@@ -321,6 +334,44 @@ function addStudent() {
     delete newStudent.isNew;
     markDirty();
   });
+}
+
+async function addProfessorStudent() {
+  const name = prompt("Nome do aluno:");
+  if (!name) return;
+  const turma = prompt("Turma: Muay Thai 08:00, Boxe 16:30, Muay Thai 17:40 ou Muay Thai 19:00", "Muay Thai 19:00");
+  if (!turma) return;
+  const categoria = prompt("Categoria: Mensal, Semestral, Anual ou TotalPass", "Mensal") || "Mensal";
+  const [modalidade, horario] = splitClass(turma);
+  const newStudent = {
+    id: `aluno-${Date.now()}`,
+    aluno: name,
+    modalidade,
+    horario,
+    turma,
+    cobrado: "Nao",
+    pago: "Nao",
+    valor: 0,
+    forma: "Pix/Outros",
+    categoria,
+    observacao: "",
+    createdBy: "professor",
+  };
+  state.students.push(newStudent);
+  markDirty();
+  if (hasSupabaseConfig) {
+    const { error } = await db.from("students").insert(toDbRow(newStudent));
+    if (error) {
+      state.students = state.students.filter((student) => student.id !== newStudent.id);
+      markDirty();
+      alert(`Não consegui salvar o aluno novo: ${error.message}`);
+      render();
+      return;
+    }
+    saveStudents();
+  }
+  alert("Aluno adicionado. O valor e pagamento ficam para o administrador lançar.");
+  render();
 }
 
 function handleDelete(student) {

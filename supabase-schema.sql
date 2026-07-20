@@ -55,6 +55,19 @@ with check (public.current_role() = 'admin');
 
 drop policy if exists "students_professor_select" on public.students;
 
+drop policy if exists "students_professor_insert" on public.students;
+create policy "students_professor_insert"
+on public.students
+for insert
+to authenticated
+with check (
+  public.current_role() = 'professor'
+  and created_by = 'professor'
+  and cobrado = 'Nao'
+  and pago = 'Nao'
+  and valor = 0
+);
+
 create or replace function public.get_professor_students()
 returns table (
   id text,
