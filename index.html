@@ -43,46 +43,54 @@
         </article>
       </section>
 
-      <section class="filters" aria-label="Filtros">
-        <label>
-          Buscar
-          <input id="searchInput" type="search" placeholder="Nome, turma ou observação" />
-        </label>
-        <label>
-          Status
-          <select id="statusFilter">
-            <option value="">Todos</option>
-            <option value="Pago">Pago</option>
-            <option value="Cobrado">Cobrado</option>
-            <option value="Inadimplente">Inadimplente</option>
-          </select>
-        </label>
-        <label>
-          Turma
-          <select id="classFilter">
-            <option value="">Todas</option>
-          </select>
-        </label>
-        <label>
-          Categoria
-          <select id="categoryFilter">
-            <option value="">Todas</option>
-            <option value="Mensal">Mensal</option>
-            <option value="Semestral">Semestral</option>
-            <option value="Anual">Anual</option>
-            <option value="TotalPass">TotalPass</option>
-          </select>
-        </label>
-        <label>
-          Forma
-          <select id="paymentFilter">
-            <option value="">Todas</option>
-            <option value="Pix/Outros">Pix/Outros</option>
-            <option value="Pix">Pix</option>
-            <option value="Dinheiro">Dinheiro</option>
-            <option value="Cartao de credito">Cartão de crédito</option>
-          </select>
-        </label>
+      <section class="sticky-panel" aria-label="Controles fixos">
+        <div class="quick-status" aria-label="Legenda de status">
+          <span><i class="dot paid-dot"></i>Pago</span>
+          <span><i class="dot charged-dot"></i>Cobrado</span>
+          <span><i class="dot overdue-dot"></i>Não pago</span>
+        </div>
+
+        <section class="filters" aria-label="Filtros">
+          <label>
+            Buscar
+            <input id="searchInput" type="search" placeholder="Nome, turma ou observação" />
+          </label>
+          <label>
+            Status
+            <select id="statusFilter">
+              <option value="">Todos</option>
+              <option value="Pago">Pago</option>
+              <option value="Cobrado">Cobrado</option>
+              <option value="Inadimplente">Inadimplente</option>
+            </select>
+          </label>
+          <label>
+            Turma
+            <select id="classFilter">
+              <option value="">Todas</option>
+            </select>
+          </label>
+          <label>
+            Categoria
+            <select id="categoryFilter">
+              <option value="">Todas</option>
+              <option value="Mensal">Mensal</option>
+              <option value="Semestral">Semestral</option>
+              <option value="Anual">Anual</option>
+              <option value="TotalPass">TotalPass</option>
+            </select>
+          </label>
+          <label>
+            Forma
+            <select id="paymentFilter">
+              <option value="">Todas</option>
+              <option value="Pix/Outros">Pix/Outros</option>
+              <option value="Pix">Pix</option>
+              <option value="Dinheiro">Dinheiro</option>
+              <option value="Cartao de credito">Cartão de crédito</option>
+            </select>
+          </label>
+        </section>
       </section>
 
       <section class="table-wrap" aria-label="Alunos">
@@ -105,6 +113,8 @@
         </table>
       </section>
     </main>
+
+    <button id="addStudentFab" class="fab" type="button">+ Aluno</button>
 
     <template id="rowTemplate">
       <tr>

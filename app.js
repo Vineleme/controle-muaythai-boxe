@@ -21,6 +21,7 @@ const els = {
   categoria: document.querySelector("#categoryFilter"),
   forma: document.querySelector("#paymentFilter"),
   add: document.querySelector("#addStudent"),
+  addFab: document.querySelector("#addStudentFab"),
   exportCsv: document.querySelector("#exportCsv"),
   reset: document.querySelector("#resetData"),
   paidTotal: document.querySelector("#paidTotal"),
@@ -105,6 +106,9 @@ function render() {
     const status = statusOf(student);
     row.dataset.id = student.id;
     row.classList.add(rowClass(status));
+    if (student.isNew) {
+      row.classList.add("highlight-new");
+    }
 
     for (const input of row.querySelectorAll("[data-field]")) {
       const field = input.dataset.field;
@@ -176,7 +180,7 @@ function splitClass(turma) {
 }
 
 function addStudent() {
-  state.students.push({
+  const newStudent = {
     id: `aluno-${Date.now()}`,
     aluno: "Novo aluno",
     modalidade: "Muay Thai",
@@ -188,9 +192,32 @@ function addStudent() {
     forma: "Pix/Outros",
     categoria: "Mensal",
     observacao: "",
-  });
+    isNew: true,
+  };
+  state.students.push(newStudent);
+  clearFilters();
   saveStudents();
   render();
+  requestAnimationFrame(() => {
+    const row = document.querySelector(`[data-id="${newStudent.id}"]`);
+    row?.scrollIntoView({ behavior: "smooth", block: "center" });
+    row?.querySelector('[data-field="aluno"]')?.focus();
+    delete newStudent.isNew;
+    saveStudents();
+  });
+}
+
+function clearFilters() {
+  state.filters.search = "";
+  state.filters.status = "";
+  state.filters.turma = "";
+  state.filters.categoria = "";
+  state.filters.forma = "";
+  els.search.value = "";
+  els.status.value = "";
+  els.turma.value = "";
+  els.categoria.value = "";
+  els.forma.value = "";
 }
 
 function exportCsv() {
@@ -243,6 +270,7 @@ function wireFilters() {
 }
 
 els.add.addEventListener("click", addStudent);
+els.addFab.addEventListener("click", addStudent);
 els.exportCsv.addEventListener("click", exportCsv);
 els.reset.addEventListener("click", resetData);
 wireFilters();
