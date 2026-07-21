@@ -178,6 +178,11 @@ button.ghost,
   border-color: #b21d2b;
 }
 
+.values-toggle {
+  background: #243735;
+  border-color: #243735;
+}
+
 .dark-theme .theme-toggle {
   background: #ffffff;
   border-color: #ffffff;
@@ -526,6 +531,16 @@ td:first-child input {
   font-weight: 700;
 }
 
+.values-hidden th:nth-child(7),
+.values-hidden td:nth-child(7) {
+  display: none;
+}
+
+.values-hidden .metric strong,
+.values-hidden .month-stats dd {
+  letter-spacing: 2px;
+}
+
 .name-edit {
   display: grid;
   gap: 6px;
@@ -692,6 +707,7 @@ tr.status-inadimplente td:first-child input {
   }
 
   .actions #saveData,
+  .actions #toggleValues,
   .actions #addStudent {
     grid-column: span 2;
   }

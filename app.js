@@ -3,6 +3,7 @@ const DRAFT_KEY = "controle-muaythai-alunos-draft-v1";
 const ADMIN_PASSWORD_KEY = "controle-muaythai-admin-password-v1";
 const ADMIN_UNLOCK_KEY = "controle-muaythai-admin-unlocked-v1";
 const THEME_KEY = "controle-muaythai-theme-v1";
+const VALUES_HIDDEN_KEY = "controle-muaythai-values-hidden-v1";
 const OWNER_EMAIL = "vineleme@icloud.com";
 const money = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
 const accessMode = new URLSearchParams(window.location.search).get("acesso") || "admin";
@@ -51,6 +52,7 @@ const els = {
   categoria: document.querySelector("#categoryFilter"),
   forma: document.querySelector("#paymentFilter"),
   themeToggle: document.querySelector("#themeToggle"),
+  valuesToggle: document.querySelector("#toggleValues"),
   clearFilters: document.querySelector("#clearFilters"),
   save: document.querySelector("#saveData"),
   newMonth: document.querySelector("#newMonth"),
@@ -106,6 +108,26 @@ function applyTheme() {
   const theme = localStorage.getItem(THEME_KEY) || "light";
   document.body.classList.toggle("dark-theme", theme === "dark");
   els.themeToggle.textContent = theme === "dark" ? "Fundo branco" : "Fundo preto";
+}
+
+function areValuesHidden() {
+  return localStorage.getItem(VALUES_HIDDEN_KEY) === "Sim";
+}
+
+function formatValue(value) {
+  return areValuesHidden() ? "••••" : money.format(value);
+}
+
+function applyValueVisibility() {
+  const hidden = areValuesHidden();
+  document.body.classList.toggle("values-hidden", hidden);
+  els.valuesToggle.textContent = hidden ? "Mostrar valores" : "Esconder valores";
+}
+
+function toggleValues() {
+  localStorage.setItem(VALUES_HIDDEN_KEY, areValuesHidden() ? "Nao" : "Sim");
+  applyValueVisibility();
+  renderSummary(visibleStudents());
 }
 
 function toggleTheme() {
@@ -241,6 +263,7 @@ function applyAccessMode() {
   els.accessBadge.textContent = isProfessorMode
     ? "Acesso professor: consulta completa, cadastro de aluno novo e solicitação de remoção."
     : saveStatusText();
+  applyValueVisibility();
   els.summary.hidden = false;
   els.tableWrap.hidden = false;
   els.professorView.hidden = true;
@@ -289,20 +312,20 @@ function renderSummary(students) {
     total: buckets.Cobrado.total + buckets.Inadimplente.total,
   };
 
-  els.paidTotal.textContent = money.format(buckets.Pago.total);
+  els.paidTotal.textContent = formatValue(buckets.Pago.total);
   els.paidCount.textContent = `${buckets.Pago.count} alunos`;
-  els.unpaidTotal.textContent = money.format(unpaid.total);
+  els.unpaidTotal.textContent = formatValue(unpaid.total);
   els.unpaidCount.textContent = `${unpaid.count} alunos`;
-  els.chargedTotal.textContent = money.format(buckets.Cobrado.total);
+  els.chargedTotal.textContent = formatValue(buckets.Cobrado.total);
   els.chargedCount.textContent = `${buckets.Cobrado.count} alunos`;
-  els.overdueTotal.textContent = money.format(buckets.Inadimplente.total);
+  els.overdueTotal.textContent = formatValue(buckets.Inadimplente.total);
   els.overdueCount.textContent = `${buckets.Inadimplente.count} alunos`;
 
   const expected = buckets.Pago.total + unpaid.total;
   const rate = expected > 0 ? Math.round((buckets.Pago.total / expected) * 100) : 0;
-  els.expectedTotal.textContent = money.format(expected);
-  els.receivedPanelTotal.textContent = money.format(buckets.Pago.total);
-  els.pendingPanelTotal.textContent = money.format(unpaid.total);
+  els.expectedTotal.textContent = formatValue(expected);
+  els.receivedPanelTotal.textContent = formatValue(buckets.Pago.total);
+  els.pendingPanelTotal.textContent = formatValue(unpaid.total);
   els.receiveRate.textContent = `${rate}%`;
   els.receiveProgress.style.width = `${rate}%`;
 }
@@ -701,6 +724,7 @@ function wireFilters() {
 els.add.addEventListener("click", addStudent);
 els.addFab.addEventListener("click", addStudent);
 els.themeToggle.addEventListener("click", toggleTheme);
+els.valuesToggle.addEventListener("click", toggleValues);
 els.clearFilters.addEventListener("click", () => {
   clearFilters();
   render();
@@ -714,5 +738,6 @@ els.loginForm.addEventListener("submit", login);
 els.logout.addEventListener("click", logout);
 wireFilters();
 applyTheme();
+applyValueVisibility();
 loadSession();
 render();
