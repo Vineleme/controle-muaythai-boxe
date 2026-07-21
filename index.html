@@ -8,7 +8,7 @@
     <link rel="icon" type="image/png" href="./assets/ct-taz-logo.png" />
     <link rel="apple-touch-icon" href="./assets/ct-taz-logo.png" />
     <link rel="manifest" href="./site.webmanifest" />
-    <link rel="stylesheet" href="./styles.css?v=22" />
+    <link rel="stylesheet" href="./styles.css?v=23" />
   </head>
   <body>
     <section id="loginView" class="login-view" hidden>
@@ -102,7 +102,6 @@
         <div class="quick-status" aria-label="Legenda de status">
           <span><i class="dot paid-dot"></i>Pago</span>
           <span><i class="dot charged-dot"></i>Cobrado</span>
-          <span><i class="dot followup-dot"></i>Retornar</span>
           <span><i class="dot overdue-dot"></i>Não pago</span>
           <button id="toggleSearch" class="search-toggle" type="button" aria-expanded="false" aria-controls="searchPanel" aria-label="Buscar">
             <i></i>
@@ -132,7 +131,6 @@
                 <option value="">Todos</option>
                 <option value="Pago">Pago</option>
                 <option value="Cobrado">Cobrado</option>
-                <option value="Retornar">Retornar</option>
                 <option value="Inadimplente">Inadimplente</option>
               </select>
             </label>
@@ -195,6 +193,7 @@
       <tr>
         <td>
           <div class="name-edit">
+            <span class="charge-badge" title="Cobranca"></span>
             <input class="name-input" data-field="aluno" />
             <button class="edit-name" type="button">Editar</button>
           </div>
@@ -203,7 +202,6 @@
           <select data-field="cobrado">
             <option value="Nao">Nao</option>
             <option value="Sim">Sim</option>
-            <option value="Retornar">Retornar</option>
           </select>
         </td>
         <td>
@@ -246,6 +244,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="./supabase-config.js?v=2"></script>
     <script src="./data.js?v=4"></script>
-    <script src="./app.js?v=22"></script>
+    <script src="./app.js?v=23"></script>
   </body>
 </html>

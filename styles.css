@@ -9,7 +9,7 @@
   --brand: #0f766e;
   --paid: #20f05a;
   --charged: #fff200;
-  --followup: #16a3ff;
+  --charged-done: #16a3ff;
   --overdue: #ff2438;
   --glow-green: rgba(32, 240, 90, 0.42);
   --glow-blue: rgba(22, 163, 255, 0.46);
@@ -387,11 +387,6 @@ button.ghost,
   background: var(--charged);
 }
 
-.followup-dot {
-  background: var(--followup);
-  box-shadow: 0 0 14px var(--glow-blue);
-}
-
 .overdue-dot {
   background: var(--overdue);
   box-shadow: 0 0 14px var(--glow-red);
@@ -457,10 +452,6 @@ select:disabled {
 
 .professor-card.status-cobrado {
   border-left-color: #d6cc00;
-}
-
-.professor-card.status-retornar {
-  border-left-color: var(--followup);
 }
 
 .professor-card span {
@@ -537,10 +528,6 @@ tbody tr:nth-child(even) td {
   color: #ff7b86;
 }
 
-.dark-theme .status-pill.retornar {
-  color: #7fd0ff;
-}
-
 td:first-child input {
   border-color: transparent;
   font-weight: 700;
@@ -557,9 +544,39 @@ td:first-child input {
 }
 
 .name-edit {
+  align-items: center;
   display: grid;
   gap: 6px;
-  grid-template-columns: minmax(130px, 1fr) auto;
+  grid-template-columns: auto minmax(130px, 1fr) auto;
+}
+
+.charge-badge {
+  align-items: center;
+  background: color-mix(in srgb, var(--surface) 78%, var(--line));
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: transparent;
+  display: inline-flex;
+  font-size: 10px;
+  font-weight: 900;
+  height: 20px;
+  justify-content: center;
+  letter-spacing: 0;
+  width: 20px;
+}
+
+.charge-badge.charged {
+  background: var(--charged);
+  border-color: #d6cc00;
+  box-shadow: 0 0 14px rgba(255, 242, 0, 0.52);
+  color: #1b1b00;
+}
+
+.charge-badge.done {
+  background: var(--charged-done);
+  border-color: #008ad8;
+  box-shadow: 0 0 14px var(--glow-blue);
+  color: #ffffff;
 }
 
 .edit-name {
@@ -575,12 +592,6 @@ tr.status-pago td:first-child input {
 tr.status-cobrado td:first-child input {
   background: var(--charged);
   color: #1b1b00;
-}
-
-tr.status-retornar td:first-child input {
-  background: var(--followup);
-  box-shadow: 0 0 16px var(--glow-blue);
-  color: #ffffff;
 }
 
 tr.status-inadimplente td:first-child input {
@@ -607,12 +618,6 @@ tr.status-inadimplente td:first-child input {
 .status-pill.cobrado {
   background: #fff8a8;
   color: #685f00;
-}
-
-.status-pill.retornar {
-  background: rgba(22, 163, 255, 0.16);
-  box-shadow: inset 0 0 0 1px rgba(22, 163, 255, 0.34), 0 0 18px var(--glow-blue);
-  color: #006aa8;
 }
 
 .status-pill.inadimplente {
@@ -859,10 +864,6 @@ tr.status-inadimplente td:first-child input {
     border-left-color: #d6cc00;
   }
 
-  tr.status-retornar {
-    border-left-color: var(--followup);
-  }
-
   tbody tr:nth-child(even) td,
   .dark-theme tbody tr:nth-child(even) td {
     background: transparent;
@@ -936,7 +937,12 @@ tr.status-inadimplente td:first-child input {
   .name-edit {
     align-items: center;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .charge-badge {
+    height: 18px;
+    width: 18px;
   }
 
   .edit-name {

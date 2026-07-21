@@ -159,10 +159,14 @@ async function persistStudents() {
 
 function normalizeStudents(students) {
   return students.map((student) => {
+    const normalized = {
+      ...student,
+      cobrado: student.cobrado === "Retornar" ? "Sim" : student.cobrado,
+    };
     if (student.turma === "Muay Thai 19:00:00") {
-      return { ...student, horario: "19:00", turma: "Muay Thai 19:00" };
+      return { ...normalized, horario: "19:00", turma: "Muay Thai 19:00" };
     }
-    return student;
+    return normalized;
   });
 }
 
@@ -175,7 +179,6 @@ function normalize(value) {
 
 function statusOf(student) {
   if (student.pago === "Sim") return "Pago";
-  if (student.cobrado === "Retornar") return "Retornar";
   if (student.cobrado === "Sim") return "Cobrado";
   return "Inadimplente";
 }
@@ -261,6 +264,13 @@ function render() {
     editNameButton.textContent = state.editingNameId === student.id ? "Confirmar" : "Editar";
     editNameButton.addEventListener("click", () => toggleNameEdit(student.id, row));
 
+    const chargeBadge = row.querySelector(".charge-badge");
+    const chargeState = student.cobrado === "Sim" ? (student.pago === "Sim" ? "done" : "charged") : "off";
+    chargeBadge.textContent = chargeState === "off" ? "" : "C";
+    chargeBadge.className = `charge-badge ${chargeState}`;
+    chargeBadge.title =
+      chargeState === "done" ? "Cobrado e pago" : chargeState === "charged" ? "Cobrado, aguardando pagamento" : "Nao cobrado";
+
     const pill = row.querySelector(".status-pill");
     pill.textContent = status;
     pill.className = `status-pill ${rowClass(status).replace("status-", "")}`;
@@ -319,7 +329,6 @@ function renderSummary(students) {
   const buckets = {
     Pago: { count: 0, total: 0 },
     Cobrado: { count: 0, total: 0 },
-    Retornar: { count: 0, total: 0 },
     Inadimplente: { count: 0, total: 0 },
   };
 
@@ -330,16 +339,16 @@ function renderSummary(students) {
   }
 
   const unpaid = {
-    count: buckets.Cobrado.count + buckets.Retornar.count + buckets.Inadimplente.count,
-    total: buckets.Cobrado.total + buckets.Retornar.total + buckets.Inadimplente.total,
+    count: buckets.Cobrado.count + buckets.Inadimplente.count,
+    total: buckets.Cobrado.total + buckets.Inadimplente.total,
   };
 
   els.paidTotal.textContent = formatValue(buckets.Pago.total);
   els.paidCount.textContent = `${buckets.Pago.count} alunos`;
   els.unpaidTotal.textContent = formatValue(unpaid.total);
   els.unpaidCount.textContent = `${unpaid.count} alunos`;
-  els.chargedTotal.textContent = formatValue(buckets.Cobrado.total + buckets.Retornar.total);
-  els.chargedCount.textContent = `${buckets.Cobrado.count + buckets.Retornar.count} alunos`;
+  els.chargedTotal.textContent = formatValue(buckets.Cobrado.total);
+  els.chargedCount.textContent = `${buckets.Cobrado.count} alunos`;
   els.overdueTotal.textContent = formatValue(buckets.Inadimplente.total);
   els.overdueCount.textContent = `${buckets.Inadimplente.count} alunos`;
 
