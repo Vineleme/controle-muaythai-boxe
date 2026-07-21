@@ -51,6 +51,7 @@ const els = {
   categoria: document.querySelector("#categoryFilter"),
   forma: document.querySelector("#paymentFilter"),
   themeToggle: document.querySelector("#themeToggle"),
+  clearFilters: document.querySelector("#clearFilters"),
   save: document.querySelector("#saveData"),
   add: document.querySelector("#addStudent"),
   addFab: document.querySelector("#addStudentFab"),
@@ -66,6 +67,11 @@ const els = {
   chargedCount: document.querySelector("#chargedCount"),
   overdueTotal: document.querySelector("#overdueTotal"),
   overdueCount: document.querySelector("#overdueCount"),
+  expectedTotal: document.querySelector("#expectedTotal"),
+  receivedPanelTotal: document.querySelector("#receivedPanelTotal"),
+  pendingPanelTotal: document.querySelector("#pendingPanelTotal"),
+  receiveRate: document.querySelector("#receiveRate"),
+  receiveProgress: document.querySelector("#receiveProgress"),
 };
 
 function loadStudents() {
@@ -289,6 +295,14 @@ function renderSummary(students) {
   els.chargedCount.textContent = `${buckets.Cobrado.count} alunos`;
   els.overdueTotal.textContent = money.format(buckets.Inadimplente.total);
   els.overdueCount.textContent = `${buckets.Inadimplente.count} alunos`;
+
+  const expected = buckets.Pago.total + unpaid.total;
+  const rate = expected > 0 ? Math.round((buckets.Pago.total / expected) * 100) : 0;
+  els.expectedTotal.textContent = money.format(expected);
+  els.receivedPanelTotal.textContent = money.format(buckets.Pago.total);
+  els.pendingPanelTotal.textContent = money.format(unpaid.total);
+  els.receiveRate.textContent = `${rate}%`;
+  els.receiveProgress.style.width = `${rate}%`;
 }
 
 function updateStudent(id, field, rawValue) {
@@ -669,6 +683,10 @@ function wireFilters() {
 els.add.addEventListener("click", addStudent);
 els.addFab.addEventListener("click", addStudent);
 els.themeToggle.addEventListener("click", toggleTheme);
+els.clearFilters.addEventListener("click", () => {
+  clearFilters();
+  render();
+});
 els.save.addEventListener("click", persistStudents);
 els.toggleSearch.addEventListener("click", toggleSearchPanel);
 els.exportCsv.addEventListener("click", exportCsv);

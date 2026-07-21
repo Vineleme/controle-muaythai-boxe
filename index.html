@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Controle Muay Thai e Boxe</title>
-    <link rel="stylesheet" href="./styles.css?v=15" />
+    <link rel="stylesheet" href="./styles.css?v=16" />
   </head>
   <body>
     <section id="loginView" class="login-view" hidden>
@@ -67,6 +67,31 @@
         </article>
       </section>
 
+      <section class="month-panel" aria-label="Saúde do mês">
+        <div>
+          <p class="eyebrow">Saúde do mês</p>
+          <strong id="receiveRate">0%</strong>
+          <span>das mensalidades visíveis estão pagas</span>
+        </div>
+        <div class="progress-track" aria-hidden="true">
+          <i id="receiveProgress"></i>
+        </div>
+        <dl class="month-stats">
+          <div>
+            <dt>Previsto</dt>
+            <dd id="expectedTotal">R$ 0,00</dd>
+          </div>
+          <div>
+            <dt>Recebido</dt>
+            <dd id="receivedPanelTotal">R$ 0,00</dd>
+          </div>
+          <div>
+            <dt>Pendente</dt>
+            <dd id="pendingPanelTotal">R$ 0,00</dd>
+          </div>
+        </dl>
+      </section>
+
       <section class="sticky-panel" aria-label="Controles fixos">
         <div class="quick-status" aria-label="Legenda de status">
           <span><i class="dot paid-dot"></i>Pago</span>
@@ -77,6 +102,7 @@
             <i></i>
             <i></i>
           </button>
+          <button id="clearFilters" class="clear-filters" type="button">Limpar filtros</button>
         </div>
 
         <div id="searchPanel" class="search-panel" hidden>
@@ -204,6 +230,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="./supabase-config.js?v=1"></script>
     <script src="./data.js?v=4"></script>
-    <script src="./app.js?v=15"></script>
+    <script src="./app.js?v=16"></script>
   </body>
 </html>
