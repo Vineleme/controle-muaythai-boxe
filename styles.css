@@ -587,6 +587,13 @@ td:first-child input {
 tr.status-pago td:first-child input {
   background: var(--paid);
   box-shadow: 0 0 16px var(--glow-green);
+  color: #ffffff;
+  text-shadow:
+    -1px -1px 0 #07100d,
+    1px -1px 0 #07100d,
+    -1px 1px 0 #07100d,
+    1px 1px 0 #07100d,
+    0 1px 4px rgba(0, 0, 0, 0.45);
 }
 
 tr.status-cobrado td:first-child input {
