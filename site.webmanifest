@@ -1,0 +1,15 @@
+{
+  "name": "Controle Muay Thai e Boxe",
+  "short_name": "CT TAZ",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f4f8f7",
+  "theme_color": "#08776f",
+  "icons": [
+    {
+      "src": "./assets/ct-taz-logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
