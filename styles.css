@@ -737,6 +737,7 @@ tr.status-inadimplente td:first-child input {
     position: sticky;
     top: 0;
     z-index: 30;
+    backdrop-filter: blur(16px);
     margin-left: -10px;
     margin-right: -10px;
     padding: 8px 10px 10px;
@@ -744,6 +745,7 @@ tr.status-inadimplente td:first-child input {
 
   .quick-status {
     gap: 6px;
+    justify-content: space-between;
     overflow-x: auto;
     padding-bottom: 2px;
   }
@@ -751,6 +753,10 @@ tr.status-inadimplente td:first-child input {
   .quick-status span {
     flex: 0 0 auto;
     font-size: 12px;
+  }
+
+  .quick-status .clear-filters {
+    flex: 1 0 auto;
   }
 
   .filters {
@@ -767,6 +773,8 @@ tr.status-inadimplente td:first-child input {
   }
 
   .table-wrap {
+    background: transparent;
+    border: 0;
     border-radius: 6px;
     box-shadow: none;
     overflow: visible;
@@ -784,17 +792,18 @@ tr.status-inadimplente td:first-child input {
 
   tbody {
     display: grid;
-    gap: 10px;
+    gap: 8px;
     width: 100%;
   }
 
   tr {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-left: 7px solid var(--overdue);
+    background: linear-gradient(135deg, var(--surface), color-mix(in srgb, var(--surface) 82%, var(--wash)));
+    border: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
+    border-left: 6px solid var(--overdue);
     border-radius: 8px;
-    box-shadow: 0 10px 22px var(--shadow);
+    box-shadow: 0 8px 18px var(--shadow);
     display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     overflow: hidden;
     width: 100%;
   }
@@ -817,23 +826,32 @@ tr.status-inadimplente td:first-child input {
     border-top: 1px solid var(--line);
     display: grid;
     gap: 8px;
-    grid-template-columns: minmax(92px, 0.34fr) minmax(0, 0.66fr);
+    grid-template-columns: 1fr;
     min-width: 0;
-    padding: 8px;
+    padding: 8px 9px;
   }
 
   td:first-child {
     border-top: 0;
+    grid-column: 1 / -1;
     display: block;
-    padding-top: 10px;
+    padding: 9px 10px 6px;
   }
 
   td::before {
     color: var(--muted);
     content: "";
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 800;
     text-transform: uppercase;
+  }
+
+  td:nth-child(2),
+  td:nth-child(7),
+  td:nth-child(8),
+  td:nth-child(9),
+  td:nth-child(10) {
+    display: none;
   }
 
   td:nth-child(2)::before {
@@ -841,7 +859,7 @@ tr.status-inadimplente td:first-child input {
   }
 
   td:nth-child(3)::before {
-    content: "Pago?";
+    content: "Pago";
   }
 
   td:nth-child(4)::before {
@@ -868,33 +886,40 @@ tr.status-inadimplente td:first-child input {
     content: "Observacao";
   }
 
-  td:nth-child(10) {
-    display: block;
-  }
-
-  td:nth-child(10)::before {
-    content: "";
-  }
-
   .name-edit {
-    grid-template-columns: 1fr;
+    align-items: center;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
   }
 
-  .edit-name,
-  .delete-row {
-    min-height: 42px;
-    width: 100%;
+  .edit-name {
+    min-height: 36px;
+    padding: 6px 9px;
   }
 
   input,
   select {
     font-size: 16px;
-    min-height: 42px;
+    min-height: 38px;
     min-width: 0;
   }
 
+  td:first-child input {
+    min-height: 40px;
+  }
+
+  td:not(:first-child) select,
+  td:not(:first-child) input {
+    font-size: 14px;
+    min-height: 34px;
+    padding: 5px 7px;
+  }
+
   .status-pill {
+    font-size: 11px;
+    min-height: 34px;
     min-width: 0;
+    padding: 7px 5px;
     width: 100%;
   }
 
