@@ -53,6 +53,7 @@ const els = {
   themeToggle: document.querySelector("#themeToggle"),
   clearFilters: document.querySelector("#clearFilters"),
   save: document.querySelector("#saveData"),
+  newMonth: document.querySelector("#newMonth"),
   add: document.querySelector("#addStudent"),
   addFab: document.querySelector("#addStudentFab"),
   accessBadge: document.querySelector("#accessBadge"),
@@ -244,6 +245,7 @@ function applyAccessMode() {
   els.tableWrap.hidden = false;
   els.professorView.hidden = true;
   els.save.hidden = isProfessorMode;
+  els.newMonth.hidden = isProfessorMode;
   els.add.hidden = false;
   els.addFab.hidden = false;
   els.exportCsv.hidden = isProfessorMode;
@@ -516,6 +518,22 @@ function resetData() {
   render();
 }
 
+function startNewMonth() {
+  const confirmed = confirm(
+    "Virar o mês e começar uma nova cobrança? Isso vai colocar Cobrado? e Pago? como Nao para todos os alunos, mantendo nomes, turmas, categorias, valores e formas de pagamento."
+  );
+  if (!confirmed) return;
+  state.students = state.students.map((student) => ({
+    ...student,
+    cobrado: "Nao",
+    pago: "Nao",
+  }));
+  clearFilters();
+  markDirty();
+  render();
+  alert("Novo mês iniciado. Confira e clique em Salvar alterações para gravar.");
+}
+
 async function loadSession() {
   if (!hasSupabaseConfig) return;
   const { data } = await db.auth.getSession();
@@ -688,6 +706,7 @@ els.clearFilters.addEventListener("click", () => {
   render();
 });
 els.save.addEventListener("click", persistStudents);
+els.newMonth.addEventListener("click", startNewMonth);
 els.toggleSearch.addEventListener("click", toggleSearchPanel);
 els.exportCsv.addEventListener("click", exportCsv);
 els.reset.addEventListener("click", resetData);

@@ -171,6 +171,11 @@ button.ghost,
   border-color: #101716;
 }
 
+.month-reset {
+  background: #b21d2b;
+  border-color: #b21d2b;
+}
+
 .dark-theme .theme-toggle {
   background: #ffffff;
   border-color: #ffffff;
