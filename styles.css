@@ -547,7 +547,7 @@ td:first-child input {
   align-items: center;
   display: grid;
   gap: 6px;
-  grid-template-columns: auto minmax(130px, 1fr) auto;
+  grid-template-columns: minmax(130px, 1fr) auto auto;
 }
 
 .charge-badge {
@@ -559,10 +559,10 @@ td:first-child input {
   display: inline-flex;
   font-size: 10px;
   font-weight: 900;
-  height: 20px;
+  height: 24px;
   justify-content: center;
   letter-spacing: 0;
-  width: 20px;
+  width: 24px;
 }
 
 .charge-badge.charged {
@@ -575,7 +575,7 @@ td:first-child input {
 .charge-badge.done {
   background: var(--charged-done);
   border-color: #008ad8;
-  box-shadow: 0 0 14px var(--glow-blue);
+  box-shadow: 0 0 0 2px rgba(22, 163, 255, 0.2), 0 0 18px var(--glow-blue);
   color: #ffffff;
 }
 
@@ -937,12 +937,12 @@ tr.status-inadimplente td:first-child input {
   .name-edit {
     align-items: center;
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) auto auto;
   }
 
   .charge-badge {
-    height: 18px;
-    width: 18px;
+    height: 22px;
+    width: 22px;
   }
 
   .edit-name {
