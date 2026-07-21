@@ -565,7 +565,7 @@ async function loadStudentsFromDb() {
     return;
   }
   if (!isProfessorMode && (!data || data.length === 0)) {
-    state.students = normalizeStudents(structuredClone(window.INITIAL_STUDENTS || []));
+    state.students = normalizeStudents(state.students.length ? state.students : structuredClone(window.INITIAL_STUDENTS || []));
     state.dirty = true;
     localStorage.setItem(DRAFT_KEY, JSON.stringify(state.students));
     return;
