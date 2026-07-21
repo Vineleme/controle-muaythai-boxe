@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Controle Muay Thai e Boxe</title>
-    <link rel="stylesheet" href="./styles.css?v=13" />
+    <link rel="stylesheet" href="./styles.css?v=14" />
   </head>
   <body>
     <section id="loginView" class="login-view" hidden>
@@ -148,7 +148,12 @@
 
     <template id="rowTemplate">
       <tr>
-        <td><input class="name-input" data-field="aluno" /></td>
+        <td>
+          <div class="name-edit">
+            <input class="name-input" data-field="aluno" />
+            <button class="edit-name" type="button">Editar</button>
+          </div>
+        </td>
         <td>
           <select data-field="cobrado">
             <option value="Nao">Nao</option>
@@ -195,6 +200,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="./supabase-config.js?v=1"></script>
     <script src="./data.js?v=4"></script>
-    <script src="./app.js?v=13"></script>
+    <script src="./app.js?v=14"></script>
   </body>
 </html>

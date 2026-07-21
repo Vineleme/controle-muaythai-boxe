@@ -15,6 +15,7 @@ let isAdminUnlocked = isProfessorMode || hasSupabaseConfig || sessionStorage.get
 const state = {
   students: loadStudents(),
   dirty: hasDraftOnLoad,
+  editingNameId: null,
   user: null,
   role: isProfessorMode ? "professor" : "admin",
   filters: {
@@ -184,9 +185,17 @@ function render() {
       const field = input.dataset.field;
       input.value = field === "valor" ? String(student.valor || "") : student[field] || "";
       applyFieldPermission(input, student, field);
-      input.addEventListener("input", () => updateStudent(student.id, field, input.value));
-      input.addEventListener("change", () => updateStudent(student.id, field, input.value));
+      if (field === "aluno") {
+        input.disabled = isProfessorMode || state.editingNameId !== student.id;
+      } else {
+        input.addEventListener("change", () => updateStudent(student.id, field, input.value));
+      }
     }
+
+    const editNameButton = row.querySelector(".edit-name");
+    editNameButton.hidden = isProfessorMode;
+    editNameButton.textContent = state.editingNameId === student.id ? "Confirmar" : "Editar";
+    editNameButton.addEventListener("click", () => toggleNameEdit(student.id, row));
 
     const pill = row.querySelector(".status-pill");
     pill.textContent = status;
@@ -285,6 +294,22 @@ function updateStudent(id, field, rawValue) {
   render();
 }
 
+function toggleNameEdit(id, row) {
+  const input = row.querySelector('[data-field="aluno"]');
+  if (state.editingNameId === id) {
+    state.editingNameId = null;
+    updateStudent(id, "aluno", input.value);
+    return;
+  }
+  state.editingNameId = id;
+  render();
+  requestAnimationFrame(() => {
+    const nextInput = document.querySelector(`[data-id="${id}"] [data-field="aluno"]`);
+    nextInput?.focus();
+    nextInput?.select();
+  });
+}
+
 function markDirty() {
   state.dirty = true;
   localStorage.setItem(DRAFT_KEY, JSON.stringify(state.students));
@@ -328,9 +353,15 @@ function addStudent() {
   requestAnimationFrame(() => {
     const row = document.querySelector(`[data-id="${newStudent.id}"]`);
     row?.scrollIntoView({ behavior: "smooth", block: "center" });
-    row?.querySelector('[data-field="aluno"]')?.focus();
+    state.editingNameId = newStudent.id;
     delete newStudent.isNew;
     markDirty();
+    render();
+    requestAnimationFrame(() => {
+      const input = document.querySelector(`[data-id="${newStudent.id}"] [data-field="aluno"]`);
+      input?.focus();
+      input?.select();
+    });
   });
 }
 
