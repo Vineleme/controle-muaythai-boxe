@@ -250,7 +250,7 @@ function applyAccessMode() {
   els.addFab.hidden = false;
   els.exportCsv.hidden = isProfessorMode;
   els.reset.hidden = isProfessorMode;
-  els.logout.hidden = isProfessorMode || (hasSupabaseConfig ? !state.user : !isAdminUnlocked);
+  els.logout.hidden = hasSupabaseConfig ? !state.user : isProfessorMode || !isAdminUnlocked;
 }
 
 function updateLoginView() {
