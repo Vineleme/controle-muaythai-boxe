@@ -175,6 +175,7 @@ function normalize(value) {
 
 function statusOf(student) {
   if (student.pago === "Sim") return "Pago";
+  if (student.cobrado === "Retornar") return "Retornar";
   if (student.cobrado === "Sim") return "Cobrado";
   return "Inadimplente";
 }
@@ -318,6 +319,7 @@ function renderSummary(students) {
   const buckets = {
     Pago: { count: 0, total: 0 },
     Cobrado: { count: 0, total: 0 },
+    Retornar: { count: 0, total: 0 },
     Inadimplente: { count: 0, total: 0 },
   };
 
@@ -328,16 +330,16 @@ function renderSummary(students) {
   }
 
   const unpaid = {
-    count: buckets.Cobrado.count + buckets.Inadimplente.count,
-    total: buckets.Cobrado.total + buckets.Inadimplente.total,
+    count: buckets.Cobrado.count + buckets.Retornar.count + buckets.Inadimplente.count,
+    total: buckets.Cobrado.total + buckets.Retornar.total + buckets.Inadimplente.total,
   };
 
   els.paidTotal.textContent = formatValue(buckets.Pago.total);
   els.paidCount.textContent = `${buckets.Pago.count} alunos`;
   els.unpaidTotal.textContent = formatValue(unpaid.total);
   els.unpaidCount.textContent = `${unpaid.count} alunos`;
-  els.chargedTotal.textContent = formatValue(buckets.Cobrado.total);
-  els.chargedCount.textContent = `${buckets.Cobrado.count} alunos`;
+  els.chargedTotal.textContent = formatValue(buckets.Cobrado.total + buckets.Retornar.total);
+  els.chargedCount.textContent = `${buckets.Cobrado.count + buckets.Retornar.count} alunos`;
   els.overdueTotal.textContent = formatValue(buckets.Inadimplente.total);
   els.overdueCount.textContent = `${buckets.Inadimplente.count} alunos`;
 
