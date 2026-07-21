@@ -6,6 +6,7 @@ const THEME_KEY = "controle-muaythai-theme-v1";
 const VALUES_HIDDEN_KEY = "controle-muaythai-values-hidden-v1";
 const OWNER_EMAIL = "vineleme@icloud.com";
 const money = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
+const CLASS_ORDER = ["Muay Thai 08:00", "Boxe 16:30", "Muay Thai 17:40", "Muay Thai 19:00"];
 const accessMode = new URLSearchParams(window.location.search).get("acesso") || "admin";
 const supabaseConfig = window.SUPABASE_CONFIG || {};
 const hasSupabaseConfig = Boolean(supabaseConfig.url && supabaseConfig.anonKey && window.supabase);
@@ -26,6 +27,7 @@ const state = {
     turma: "",
     categoria: "",
     forma: "",
+    sort: "nome",
   },
 };
 
@@ -47,6 +49,7 @@ const els = {
   search: document.querySelector("#searchInput"),
   searchPanel: document.querySelector("#searchPanel"),
   toggleSearch: document.querySelector("#toggleSearch"),
+  sort: document.querySelector("#sortFilter"),
   status: document.querySelector("#statusFilter"),
   turma: document.querySelector("#classFilter"),
   categoria: document.querySelector("#categoryFilter"),
@@ -182,7 +185,7 @@ function rowClass(status) {
 
 function visibleStudents() {
   const query = normalize(state.filters.search);
-  return state.students.filter((student) => {
+  const filtered = state.students.filter((student) => {
     const status = statusOf(student);
     const text = normalize(`${student.aluno} ${student.turma} ${student.observacao}`);
     return (
@@ -193,6 +196,23 @@ function visibleStudents() {
       (!state.filters.forma || student.forma === state.filters.forma)
     );
   });
+  return sortStudents(filtered);
+}
+
+function sortStudents(students) {
+  const collator = new Intl.Collator("pt-BR", { sensitivity: "base", numeric: true });
+  return [...students].sort((a, b) => {
+    if (state.filters.sort === "turma") {
+      const classDiff = classRank(a.turma) - classRank(b.turma);
+      if (classDiff) return classDiff;
+    }
+    return collator.compare(a.aluno || "", b.aluno || "");
+  });
+}
+
+function classRank(turma) {
+  const index = CLASS_ORDER.indexOf(turma || "");
+  return index === -1 ? CLASS_ORDER.length : index;
 }
 
 function updateClassFilter() {
@@ -490,7 +510,9 @@ function clearFilters() {
   state.filters.turma = "";
   state.filters.categoria = "";
   state.filters.forma = "";
+  state.filters.sort = "nome";
   els.search.value = "";
+  els.sort.value = "nome";
   els.status.value = "";
   els.turma.value = "";
   els.categoria.value = "";
@@ -708,6 +730,7 @@ function escapeHtml(value) {
 function wireFilters() {
   const bindings = [
     [els.search, "search", "input"],
+    [els.sort, "sort", "change"],
     [els.status, "status", "change"],
     [els.turma, "turma", "change"],
     [els.categoria, "categoria", "change"],

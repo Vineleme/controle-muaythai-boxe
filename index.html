@@ -8,7 +8,7 @@
     <link rel="icon" type="image/png" href="./assets/ct-taz-logo.png" />
     <link rel="apple-touch-icon" href="./assets/ct-taz-logo.png" />
     <link rel="manifest" href="./site.webmanifest" />
-    <link rel="stylesheet" href="./styles.css?v=20" />
+    <link rel="stylesheet" href="./styles.css?v=21" />
   </head>
   <body>
     <section id="loginView" class="login-view" hidden>
@@ -118,6 +118,13 @@
           </label>
 
           <section class="filters" aria-label="Filtros">
+            <label>
+              Ordem
+              <select id="sortFilter">
+                <option value="nome">Por nome</option>
+                <option value="turma">Por turma e horário</option>
+              </select>
+            </label>
             <label>
               Status
               <select id="statusFilter">
@@ -236,6 +243,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="./supabase-config.js?v=2"></script>
     <script src="./data.js?v=4"></script>
-    <script src="./app.js?v=20"></script>
+    <script src="./app.js?v=21"></script>
   </body>
 </html>
