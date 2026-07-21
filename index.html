@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Controle Muay Thai e Boxe</title>
-    <link rel="stylesheet" href="./styles.css?v=14" />
+    <link rel="stylesheet" href="./styles.css?v=15" />
   </head>
   <body>
     <section id="loginView" class="login-view" hidden>
@@ -26,12 +26,16 @@
 
     <main class="app-shell">
       <header class="topbar">
-        <div>
+        <div class="brand-block">
+          <img class="brand-logo" src="./assets/ct-taz-logo.png" alt="CT TAZ Fight Team" />
+          <div>
           <p class="eyebrow">Controle financeiro</p>
           <h1>Muay Thai e Boxe</h1>
           <p id="accessBadge" class="access-badge"></p>
+          </div>
         </div>
         <div class="actions">
+          <button id="themeToggle" class="theme-toggle" type="button">Fundo preto</button>
           <button id="saveData" type="button">Salvar alterações</button>
           <button id="addStudent" type="button">Adicionar aluno</button>
           <button id="exportCsv" type="button">Exportar CSV</button>
@@ -200,6 +204,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="./supabase-config.js?v=1"></script>
     <script src="./data.js?v=4"></script>
-    <script src="./app.js?v=14"></script>
+    <script src="./app.js?v=15"></script>
   </body>
 </html>

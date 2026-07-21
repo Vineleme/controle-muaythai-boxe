@@ -2,6 +2,7 @@ const STORAGE_KEY = "controle-muaythai-alunos-v1";
 const DRAFT_KEY = "controle-muaythai-alunos-draft-v1";
 const ADMIN_PASSWORD_KEY = "controle-muaythai-admin-password-v1";
 const ADMIN_UNLOCK_KEY = "controle-muaythai-admin-unlocked-v1";
+const THEME_KEY = "controle-muaythai-theme-v1";
 const OWNER_EMAIL = "vineleme@icloud.com";
 const money = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
 const accessMode = new URLSearchParams(window.location.search).get("acesso") || "admin";
@@ -49,6 +50,7 @@ const els = {
   turma: document.querySelector("#classFilter"),
   categoria: document.querySelector("#categoryFilter"),
   forma: document.querySelector("#paymentFilter"),
+  themeToggle: document.querySelector("#themeToggle"),
   save: document.querySelector("#saveData"),
   add: document.querySelector("#addStudent"),
   addFab: document.querySelector("#addStudentFab"),
@@ -91,6 +93,18 @@ function saveStudents() {
   localStorage.removeItem(DRAFT_KEY);
   state.dirty = false;
   applyAccessMode();
+}
+
+function applyTheme() {
+  const theme = localStorage.getItem(THEME_KEY) || "light";
+  document.body.classList.toggle("dark-theme", theme === "dark");
+  els.themeToggle.textContent = theme === "dark" ? "Fundo branco" : "Fundo preto";
+}
+
+function toggleTheme() {
+  const nextTheme = document.body.classList.contains("dark-theme") ? "light" : "dark";
+  localStorage.setItem(THEME_KEY, nextTheme);
+  applyTheme();
 }
 
 async function persistStudents() {
@@ -654,6 +668,7 @@ function wireFilters() {
 
 els.add.addEventListener("click", addStudent);
 els.addFab.addEventListener("click", addStudent);
+els.themeToggle.addEventListener("click", toggleTheme);
 els.save.addEventListener("click", persistStudents);
 els.toggleSearch.addEventListener("click", toggleSearchPanel);
 els.exportCsv.addEventListener("click", exportCsv);
@@ -661,5 +676,6 @@ els.reset.addEventListener("click", resetData);
 els.loginForm.addEventListener("submit", login);
 els.logout.addEventListener("click", logout);
 wireFilters();
+applyTheme();
 loadSession();
 render();

@@ -7,9 +7,12 @@
   --surface: #ffffff;
   --wash: #f4f8f7;
   --brand: #0f766e;
-  --paid: #49a431;
+  --paid: #20f05a;
   --charged: #fff200;
-  --overdue: #ff4747;
+  --overdue: #ff2438;
+  --glow-green: rgba(32, 240, 90, 0.42);
+  --glow-red: rgba(255, 36, 56, 0.44);
+  --shadow: rgba(18, 36, 32, 0.12);
 }
 
 * {
@@ -23,6 +26,17 @@ body {
   overflow-x: auto;
 }
 
+body.dark-theme {
+  color-scheme: dark;
+  --ink: #f5fbfa;
+  --muted: #a9bab6;
+  --line: #29413e;
+  --surface: #121918;
+  --wash: #050707;
+  --brand: #099c91;
+  --shadow: rgba(0, 0, 0, 0.42);
+}
+
 [hidden] {
   display: none !important;
 }
@@ -34,6 +48,10 @@ select {
 }
 
 .app-shell {
+  background:
+    radial-gradient(circle at top left, rgba(255, 36, 56, 0.12), transparent 28rem),
+    radial-gradient(circle at top right, rgba(32, 240, 90, 0.1), transparent 24rem),
+    var(--wash);
   min-height: 100vh;
   padding: 20px 20px 84px;
 }
@@ -69,6 +87,22 @@ select {
   gap: 16px;
   justify-content: space-between;
   margin-bottom: 16px;
+}
+
+.brand-block {
+  align-items: center;
+  display: flex;
+  gap: 14px;
+}
+
+.brand-logo {
+  background: #050505;
+  border: 2px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  box-shadow: 0 10px 26px rgba(255, 36, 56, 0.24);
+  height: 76px;
+  object-fit: contain;
+  width: 76px;
 }
 
 .eyebrow {
@@ -112,6 +146,22 @@ button.ghost,
   color: var(--brand);
 }
 
+.dark-theme button.ghost,
+.dark-theme .delete-row {
+  background: #18211f;
+}
+
+.theme-toggle {
+  background: #101716;
+  border-color: #101716;
+}
+
+.dark-theme .theme-toggle {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: #101716;
+}
+
 .summary-grid {
   display: grid;
   gap: 10px;
@@ -124,6 +174,7 @@ button.ghost,
   border: 1px solid var(--line);
   border-left: 7px solid var(--brand);
   border-radius: 8px;
+  box-shadow: 0 10px 24px var(--shadow);
   padding: 14px;
 }
 
@@ -141,6 +192,7 @@ button.ghost,
 
 .metric.paid {
   border-left-color: var(--paid);
+  box-shadow: 0 0 0 1px rgba(32, 240, 90, 0.18), 0 0 24px var(--glow-green);
 }
 
 .metric.charged {
@@ -152,8 +204,12 @@ button.ghost,
   border-left-color: var(--overdue);
 }
 
+.metric.overdue {
+  box-shadow: 0 0 0 1px rgba(255, 36, 56, 0.2), 0 0 26px var(--glow-red);
+}
+
 .sticky-panel {
-  background: rgba(244, 248, 247, 0.96);
+  background: color-mix(in srgb, var(--wash) 94%, transparent);
   border-bottom: 1px solid rgba(216, 228, 225, 0.8);
   margin: 0 -20px 14px;
   padding: 10px 20px 12px;
@@ -169,7 +225,7 @@ button.ghost,
 
 .quick-status span {
   align-items: center;
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 999px;
   display: inline-flex;
@@ -224,6 +280,7 @@ button.ghost,
 
 .paid-dot {
   background: var(--paid);
+  box-shadow: 0 0 14px var(--glow-green);
 }
 
 .charged-dot {
@@ -232,6 +289,7 @@ button.ghost,
 
 .overdue-dot {
   background: var(--overdue);
+  box-shadow: 0 0 14px var(--glow-red);
 }
 
 .filters {
@@ -249,7 +307,7 @@ label {
 
 input,
 select {
-  background: #fff;
+  background: var(--surface);
   border: 1px solid #c9d6d3;
   border-radius: 6px;
   color: var(--ink);
@@ -260,7 +318,7 @@ select {
 
 input:disabled,
 select:disabled {
-  background: #f7faf9;
+  background: color-mix(in srgb, var(--surface) 88%, var(--wash));
   color: var(--ink);
   opacity: 1;
 }
@@ -353,6 +411,10 @@ tbody tr:nth-child(even) td {
   background: #e5f6fb;
 }
 
+.dark-theme tbody tr:nth-child(even) td {
+  background: #101d1b;
+}
+
 td:first-child input {
   border-color: transparent;
   font-weight: 700;
@@ -371,14 +433,17 @@ td:first-child input {
 
 tr.status-pago td:first-child input {
   background: var(--paid);
+  box-shadow: 0 0 16px var(--glow-green);
 }
 
 tr.status-cobrado td:first-child input {
   background: var(--charged);
+  color: #1b1b00;
 }
 
 tr.status-inadimplente td:first-child input {
   background: var(--overdue);
+  box-shadow: 0 0 16px var(--glow-red);
 }
 
 .status-pill {
@@ -440,6 +505,10 @@ tr.status-inadimplente td:first-child input {
     flex-direction: column;
   }
 
+  .brand-block {
+    align-items: center;
+  }
+
   .summary-grid,
   .filters {
     grid-template-columns: 1fr;
@@ -483,6 +552,11 @@ tr.status-inadimplente td:first-child input {
 
   h1 {
     font-size: 22px;
+  }
+
+  .brand-logo {
+    height: 58px;
+    width: 58px;
   }
 
   .actions {
