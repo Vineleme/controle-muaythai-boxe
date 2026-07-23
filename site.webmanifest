@@ -7,7 +7,7 @@
   "theme_color": "#08776f",
   "icons": [
     {
-      "src": "./assets/ct-taz-logo.png",
+      "src": "./assets/app-icon.png?v=1",
       "sizes": "512x512",
       "type": "image/png"
     }
